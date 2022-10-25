@@ -4,14 +4,15 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Vesting {
-    uint256 public unlockTime; // Unix time stamp in which the full amount of tokens will be available for withdrawal
+    uint256 public unlockTime; // Unix time stamp in which the vested funds will be available for withdrawal
     uint256 public amount; // Amount of vested ERC20 tokens
     address public owner; // Address which provides the vested funds
     address payable public immutable beneficiary; // Address which recieves the vested funds
     address public tokenAddress; // Contract address of the ERC20 tokens vested
     bool public isVested; // Boolean used to check if the contract has been funded
     IERC20 public token; // ERC20 interface to interact with the token contract
-
+    
+    // @param _beneficiary address that will recieve the the vested funds
     constructor(address payable _beneficiary) {
         require(_beneficiary != address(0), "Beneficiary can't be 0 address");
 
@@ -19,6 +20,7 @@ contract Vesting {
         owner = payable(msg.sender);
     }
 
+    // @param _unlockTime Unix time stamp in which the vested funds will be available for withdrawal
     function fundEth(uint256 _unlockTime) public payable {
         require(msg.sender == owner, "Only the contract owner can fund it");
         require(!isVested, "Tokens are already vested");
@@ -31,7 +33,10 @@ contract Vesting {
         unlockTime = _unlockTime;
         isVested = true;
     }
-
+    
+    // @param _unlockTime Unix time stamp in which the vested funds will be available for withdrawal
+    // @param _tokenAddress contract address of the ERC20 tokens to be vested
+    // @param _amount amount of ERC20 tokens to be vested
     function fundToken(
         uint256 _unlockTime,
         address _tokenAddress,
